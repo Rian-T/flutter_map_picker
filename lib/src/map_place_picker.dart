@@ -196,18 +196,19 @@ class PlacePickerScreenState extends State<PlacePickerScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: <Widget>[
-            widget.isSearchEnabled ? 
-              FloatingActionButton(
-              heroTag: "FAB_SEARCH_PLACE",
-              backgroundColor: Colors.white,
-              child: Icon(
-                Icons.search,
-                color: Colors.black,
-              ),
-              onPressed: () {
-                _searchPlace();
-              },
-            ) : Container(),
+            widget.isSearchEnabled
+                ? FloatingActionButton(
+                    heroTag: "FAB_SEARCH_PLACE",
+                    backgroundColor: Colors.white,
+                    child: Icon(
+                      Icons.search,
+                      color: Colors.black,
+                    ),
+                    onPressed: () {
+                      _searchPlace();
+                    },
+                  )
+                : Container(),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 8),
               child: FloatingActionButton(
@@ -274,11 +275,17 @@ class PlacePickerScreenState extends State<PlacePickerScreen> {
                       });
 
                       var address = (await _reverseGeocoding(
-                              centerCamera.latitude, centerCamera.longitude))
-                          .addressLine;
-                      loadingAddress = false;
-
-                      _setSelectedAddress(centerCamera, address);
+                          centerCamera.latitude, centerCamera.longitude));
+                      var addressLine = address.addressLine;
+                      print(address.adminArea);
+                      if (address.adminArea == "Île-de-France") {
+                        loadingAddress = false;
+                        _setSelectedAddress(centerCamera, addressLine);
+                      } else
+                        Scaffold.of(context).showSnackBar(SnackBar(
+                          content: Text(
+                              "Klapr arrive bientôt hors d'Île-De-France !"),
+                        ));
                     }
                   },
                 ),
@@ -302,10 +309,15 @@ class PlacePickerScreenState extends State<PlacePickerScreen> {
                 Container(
                   padding: EdgeInsets.only(top: 8, bottom: 8),
                   child: ListTile(
-                    title: Text(strings.address,style: TextStyle(color: widget.textColor),),
+                    title: Text(
+                      strings.address,
+                      style: TextStyle(color: widget.textColor),
+                    ),
                     subtitle: selectedAddress == null
-                        ? Text(strings.firstMessageSelectAddress, style : TextStyle(color: widget.textColor))
-                        : Text(selectedAddress, style : TextStyle(color: widget.textColor)),
+                        ? Text(strings.firstMessageSelectAddress,
+                            style: TextStyle(color: widget.textColor))
+                        : Text(selectedAddress,
+                            style: TextStyle(color: widget.textColor)),
                     trailing: loadingAddress
                         ? CircularProgressIndicator(
                             backgroundColor: mainColor,
@@ -317,19 +329,22 @@ class PlacePickerScreenState extends State<PlacePickerScreen> {
                   padding: EdgeInsets.fromLTRB(8, 0, 8, 8),
                   child: Row(
                     children: <Widget>[
-                      widget.canCancel ? Container(
-                        width: 160,
-                        padding: EdgeInsets.only(right: 16),
-                        child: FlatButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: Text(strings.cancel, style : TextStyle(color: widget.textColor)),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18.0),
-                              side: BorderSide(color: mainColor)),
-                        ),
-                      ) : Container(),
+                      widget.canCancel
+                          ? Container(
+                              width: 160,
+                              padding: EdgeInsets.only(right: 16),
+                              child: FlatButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text(strings.cancel,
+                                    style: TextStyle(color: widget.textColor)),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(18.0),
+                                    side: BorderSide(color: mainColor)),
+                              ),
+                            )
+                          : Container(),
                       Expanded(
                         child: FlatButton(
                           onPressed: !movingCamera &&
