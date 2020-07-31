@@ -346,7 +346,9 @@ class PlacePickerScreenState extends State<PlacePickerScreen> {
                             )
                           : Container(),
                       Expanded(
-                        child: FlatButton(
+                        child: Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child : FlatButton(
                           onPressed: !movingCamera &&
                                   !loadingAddress &&
                                   selectedAddress != null
@@ -369,6 +371,7 @@ class PlacePickerScreenState extends State<PlacePickerScreen> {
                               side: BorderSide(color: mainColor)),
                         ),
                       ),
+                        ),
                     ],
                   ),
                 )
